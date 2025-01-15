@@ -1,0 +1,81 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Common">
+      <UniqueIdentifier>{93d07cb2-cb1c-4d6a-8ad1-bb9093fb9d58}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="BlindEDR">
+      <UniqueIdentifier>{5e9c20be-4da5-4334-b282-c8e28c054e6e}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Common.c">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="ApiHashing.c">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="Context.c">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="EDRDetector.c">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="DriverNameUtils.c">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="CallbackManager.c">
+      <Filter>BlindEDR</Filter>
+    </ClCompile>
+    <ClCompile Include="ObjectCallbackManager.c">
+      <Filter>BlindEDR</Filter>
+    </ClCompile>
+    <ClCompile Include="RegistryCallbackManager.c">
+      <Filter>BlindEDR</Filter>
+    </ClCompile>
+    <ClCompile Include="FilterCallbackManager.c">
+      <Filter>BlindEDR</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Common.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Structs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RemoveCallBacks.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Debug.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FunctionPointers.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ApiHashing.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="IatCamo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Disclaimer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
