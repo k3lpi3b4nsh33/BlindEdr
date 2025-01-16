@@ -7,6 +7,7 @@
 #include "ApiHashing.h"
 #include "FunctionPointers.h"
 
+
 #define FIRST_HASH  0xcbf29ce484222325
 #define SECOND_HASH 0x100000001b3
 #define THIRD_HASH  0xff51afd7ed558ccd
@@ -164,17 +165,25 @@ HMODULE GetModuleHandleH(IN UINT32 uModuleHash, IN BOOL isKernel) {
             return (HMODULE)(pDte->InInitializationOrderLinks.Flink);
         }
 
+        if (uModuleHash == advapi32dll_CH) {
+            HMODULE hAdvapi32 = LoadLibraryA("advapi32.dll");
+            if (hAdvapi32) {
+                PRINT("Successfully loaded advapi32.dll at 0x%p\n", hAdvapi32);
+                return hAdvapi32;
+            }
+        }
+
         // Iterate over the loaded modules
         while (pDte) {
             if (pDte->FullDllName.Buffer && pDte->FullDllName.Length < MAX_PATH) {
-                CHAR cLDllName[MAX_PATH] = {0};
+                CHAR cLDllName[MAX_PATH] = { 0 };
                 SIZE_T x = 0;
 
                 // Convert the DLL name to lowercase
                 while (pDte->FullDllName.Buffer[x] && x < MAX_PATH - 1) {
                     WCHAR wC = pDte->FullDllName.Buffer[x];
-                    cLDllName[x] = (wC >= L'A' && wC <= L'Z') ? 
-                                  (CHAR)(wC - L'A' + L'a') : (CHAR)wC;
+                    cLDllName[x] = (wC >= L'A' && wC <= L'Z') ?
+                        (CHAR)(wC - L'A' + L'a') : (CHAR)wC;
                     x++;
                 }
 
@@ -186,6 +195,8 @@ HMODULE GetModuleHandleH(IN UINT32 uModuleHash, IN BOOL isKernel) {
             pDte = *(PLDR_DATA_TABLE_ENTRY*)(pDte);
         }
 
+        // If not found, try to load it
+        PRINT("Module with hash 0x%08x not found\n", uModuleHash);
         return NULL;
     }
 }
