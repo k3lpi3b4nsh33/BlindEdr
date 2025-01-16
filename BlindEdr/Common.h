@@ -155,5 +155,3 @@ static const PATTERN_SEARCH PREDEFINED_PATTERNS[] = {
 VOID Memcpy(IN PVOID pDestination, IN PVOID pSource, SIZE_T sLength);
 
 
-
-
