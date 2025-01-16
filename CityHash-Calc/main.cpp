@@ -90,6 +90,9 @@ typedef struct {
 
 
 const char* GOBAL_FUNCTION[] = {
+	"OpenProcessToken",
+	"LookupPrivilegeValueA",
+	"AdjustTokenPrivileges",
 	"FltEnumerateFilters",
 	"NtDuplicateObject",
 	"NtOpenThreadTokenEx",
@@ -106,6 +109,7 @@ const char* GOBAL_MODULE[] = {
 	"ntdll.dll",
 	"FLTMGR.SYS",
 	"ntoskrnl.exe",
+	"advapi32.dll",
 	NULL
 };
 
