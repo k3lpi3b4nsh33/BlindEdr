@@ -80,3 +80,14 @@ Once the blinding effect is restored, access to certain system resources is enti
 
 # Thanks
 This project was largely inspired by [RealBlindingEDR](https://github.com/myzxcg/RealBlindingEDR). Start with a simple small driver and then make driver function calls.
+
+
+
+
+
+# Update
+
+- [x] Adapt the program to the latest version of Windows
+
+> Enable the program to function properly on the latest Windows 11 24H2 version, provided that administrator privileges are required to run `BlindEDR.exe`.
+> If it is a different version, `BlindEDR.exe` can be run without the need for an administrator after starting the driver service.
