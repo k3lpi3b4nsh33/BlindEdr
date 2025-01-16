@@ -70,8 +70,13 @@ The tool operates without detection because filters have been cleared, allowing 
 
 It directly targets security solutions like Kaspersky, overriding their functionality. For example, tools like **mimikatz** can operate without interference.
 
+
+
 ![Snipaste_2025-01-15_14-39-41](./README.assets/Snipaste_2025-01-15_14-39-41.png)
 
 Once the blinding effect is restored, access to certain system resources is entirely disabled, reinforcing security measures.
 
 ![Snipaste_2025-01-15_14-40-43](./README.assets/Snipaste_2025-01-15_14-40-43.png)
+
+# Thanks
+This project was largely inspired by [RealBlindingEDR](https://github.com/myzxcg/RealBlindingEDR). Start with a simple small driver and then make driver function calls.
