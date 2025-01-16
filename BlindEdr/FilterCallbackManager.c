@@ -19,13 +19,17 @@ static inline SIZE_T GetInstanceOffset(DWORD major) {
 }
 
 static inline SIZE_T GetCallbackOffset(DWORD major, DWORD build) {
-	return (major == 10 && build < 22000) ? 0xa0 :
+	return
+		(major == 10 && build == 26100) ? 0xa0 : // Windows11 24H2
+		(major == 10 && build < 22000) ? 0xa0 :
 		(major == 10 && build >= 22000) ? 0xa8 :
 		(major == 6) ? 0x90 : 0;
 }
 
 static inline SIZE_T GetFilterCallbackOffset(DWORD major, DWORD build) {
-	return	(major == 10) ? (build >= 22621 ? 0x130 : 0x120) :
+	return
+		(major == 10 && build == 26100) ? 0x120 : // Windows11 24H2
+		(major == 10) ? (build >= 22621 ? 0x130 : 0x120) :
 		(major == 6) ? 0x110 : 0;
 }
 

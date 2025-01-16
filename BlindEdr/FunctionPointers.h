@@ -11,12 +11,23 @@ typedef HMODULE(WINAPI* fnLoadLibraryExA)(
 
 typedef HMODULE(WINAPI* fnLoadLibraryA)(IN LPCSTR lpLibFileName);
 
-typedef PTP_TIMER(WINAPI* fnCreateThreadpoolTimer)(IN PTP_TIMER_CALLBACK pfnti, IN OUT OPTIONAL PVOID pv, IN OPTIONAL PTP_CALLBACK_ENVIRON pcbe);
+typedef BOOL(WINAPI* fnOpenProcessToken)(
+    HANDLE ProcessHandle,    // Handle to the process
+    DWORD DesiredAccess,    // Desired access to the token
+    PHANDLE TokenHandle     // Pointer to receive token handle
+    );
 
-typedef void (WINAPI* fnSetThreadpoolTimer)(IN OUT PTP_TIMER pti, IN OPTIONAL PFILETIME pftDueTime, IN DWORD msPeriod, IN DWORD msWindowLength);
+typedef BOOL(WINAPI* fnLookupPrivilegeValueA)(
+    LPCSTR lpSystemName,    // Name of system (NULL for local)
+    LPCSTR lpName,         // Name of privilege
+    PLUID lpLuid           // Receives LUID of privilege
+    );
 
-typedef DWORD(WINAPI* fnWaitForSingleObject)(IN HANDLE hHandle, IN DWORD dwMilliseconds);
-
-typedef PVOID(WINAPI* fnAddVectoredExceptionHandler)(ULONG First, PVECTORED_EXCEPTION_HANDLER Handler);
-
-typedef ULONG(WINAPI* fnRemoveVectoredExceptionHandler)(PVOID Handle);
+typedef BOOL(WINAPI* fnAdjustTokenPrivileges)(
+    HANDLE TokenHandle,           // Handle to token
+    BOOL DisableAllPrivileges,    // TRUE to disable all privileges
+    PTOKEN_PRIVILEGES NewState,   // Array of privileges
+    DWORD BufferLength,          // Size of buffer
+    PTOKEN_PRIVILEGES PreviousState, // Previous state (NULL if not needed)
+    PDWORD ReturnLength          // Required buffer size
+    );
