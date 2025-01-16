@@ -8,6 +8,8 @@ static INT64 EDRIntance[500] = { 0 };
 
 static CONST CHAR* subKESDriver[] = {
 	"KES-21-19",
+	"KES-21-18",
+
 	NULL
 };
 
