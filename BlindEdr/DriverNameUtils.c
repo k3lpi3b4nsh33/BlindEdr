@@ -21,11 +21,12 @@ CHAR* ReadDriverName(INT64 FLT_FILTERAddr) {
 	TCHAR* FilterName = NULL;
 	CHAR* FilterNameA = NULL;
 	DWORD dwMajor = GetNtVersion();
+	DWORD build = GetNtBuild();
 
 	// Determine offset based on Windows version
 	switch (dwMajor) {
 		case 10:
-			Offset = 0x38;
+			Offset = (build == 26100) ? 0x40 : 0x38;
 			break;
 		case 6:
 			Offset = 0x28;
